@@ -1,5 +1,4 @@
 ---
-
 - name: update web and nfs servers
   hosts: webservers, nfs
   become: yes
@@ -31,8 +30,8 @@
         echo "This is a shell script"
         echo "Executed on $(date)" >> /path/to/directory/script_output.txt
 
-
-- name: update LB and db server
+- name: update LB and db servers
+>>>>>>> ba0dd5f54c5a9891cec912aa23724d6faf0b74e2
   hosts: lb, db
   become: yes
   tasks:
