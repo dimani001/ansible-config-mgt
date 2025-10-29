@@ -10,14 +10,14 @@
 
     - name: create a directory
       file:
-        path: /path/to/directory
+        path: /home/ubuntu/ansible_test_dir
         state: directory
         mode: '0755'
 
     - name: add a file into the directory
       copy:
         content: "This is a sample file content"
-        dest: /path/to/directory/samplefile.txt
+        dest: /home/ubuntu/ansible_test_dir/samplefile.txt
         mode: '0644'
 
     - name: set timezone to UTC
@@ -28,7 +28,7 @@
       shell: |
         #!/bin/bash
         echo "This is a shell script"
-        echo "Executed on $(date)" >> /path/to/directory/script_output.txt
+        echo "Executed on $(date)" >> /home/ubuntu/ansible_test_dir/script_output.txt
 
 - name: update LB and db servers
   hosts: lb, db
@@ -45,14 +45,14 @@
 
     - name: create a directory
       file:
-        path: /path/to/directory
+        path: /home/ubuntu/ansible_test_dir
         state: directory
         mode: '0755'
 
     - name: add a file into the directory
       copy:
         content: "This is a sample file content"
-        dest: /path/to/directory/samplefile.txt
+        dest: /home/ubuntu/ansible_test_dir/samplefile.txt
         mode: '0644'
 
     - name: set timezone to UTC
@@ -63,5 +63,4 @@
       shell: |
         #!/bin/bash
         echo "This is a shell script"
-        echo "Executed on $(date)" >> /path/to/directory/script_output.txt
-
+        echo "Executed on $(date)" >> /home/ubuntu/ansible_test_dir/script_output.txt
