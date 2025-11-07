@@ -1,6 +1,5 @@
 ---
-# Original Configuration: Import common setup tasks for all servers.
-# - import_playbook: ../static-assignments/common.yml
+- import_playbook: ../static-assignments/common.yml 
 
-# TEST CONFIGURATION: Temporary import to delete wireshark (for validation).
-- import_playbook: ../static-assignments/common-del.yml
+# Temporary config for wireshark deletion test:
+# - import_playbook: ../static-assignments/common-del.yml
