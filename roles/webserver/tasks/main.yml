@@ -10,7 +10,7 @@
 - name: clone a repo
   become: true
   ansible.builtin.git:
-    repo: https://github.com/<your-name>/tooling.git # <-- IMPORTANT: Replace with YOUR GitHub link
+    repo: https://github.com/dimani001/tooling.git # <-- IMPORTANT: Replace with YOUR GitHub link
     dest: /var/www/html
     force: yes
 
