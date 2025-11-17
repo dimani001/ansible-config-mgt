@@ -1,0 +1,15 @@
+---
+__mysql_log_error: /var/log/mysql/error.log
+
+mysql_root_password: "StrongPass123!"
+
+mysql_databases:
+  - name: tooling
+    encoding: latin1
+    collation: latin1_general_ci
+
+mysql_users:
+  - name: webaccess
+    host: "10.0.1.0/24"   # replace with your actual webserver subnet
+    password: "StrongPass123!"
+    priv: "tooling.*:ALL"
