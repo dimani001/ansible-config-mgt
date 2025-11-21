@@ -4,4 +4,6 @@
 
 - hosts: uat-webservers
 - import_playbook: ../static-assignments/uat-webservers.yml
-
+- import_playbook: ../static-assignments/db-servers.yml
+- import_playbook: ../static-assignments/loadbalancers.yml
+  when: load_balancer_is_required
