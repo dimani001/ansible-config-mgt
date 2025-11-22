@@ -14,7 +14,7 @@
   import_playbook: ../static-assignments/uat-webservers.yml
 
 # Database Servers (Ubuntu)
-- hosts: db
+- hosts: db-servers
   name: DB Servers assignment
   import_playbook: ../static-assignments/db-servers.yml
 
