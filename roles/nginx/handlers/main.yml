@@ -1,0 +1,21 @@
+---
+# Handler: Validate nginx configuration
+- name: validate nginx configuration
+  command: nginx -t -c /etc/nginx/nginx.conf
+  changed_when: false
+
+# Handler: Reload nginx
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+  listen: reload nginx
+
+# Handler: Restart nginx
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+  listen: restart nginx
+

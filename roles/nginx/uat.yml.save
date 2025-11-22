@@ -1,0 +1,9 @@
+[uat-webservers]
+<server1-ipaddress> ansible_ssh_user=<ec2-username>
+<server2-ipaddress> ansible_ssh_user=<ec2-username>
+
+[lb]
+<lb-instance-ip> ansible_ssh_user=<ec2-username>
+
+[db-servers]
+<db-instance-ip> ansible_ssh_user=<ec2-user>

@@ -1,0 +1,25 @@
+nginx_vhosts:
+  - listen: "80"
+    server_name: "example.com"
+    root: "/var/www/html"
+    index: "index.php index.html index.htm"
+
+    locations:
+      - path: "/"
+        proxy_pass: "http://myapp1"
+
+    server_name_redirect: "www.example.com"
+    error_page: ""
+    access_log: ""
+    error_log: ""
+    extra_parameters: ""
+    template: "{{ nginx_vhost_template }}"
+    state: "present"
+
+nginx_upstreams:
+  - name: myapp1
+    strategy: "ip_hash"
+    keepalive: 16
+    servers:
+      - "10.0.1.227 weight=5"
+      - "10.0.1.58 weight=5"
