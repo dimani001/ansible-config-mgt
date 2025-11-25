@@ -1,0 +1,40 @@
+---
+- name: Install Apache Web Server and PHP dependencies on Web Servers
+  hosts: webservers
+  become: yes
+  tasks:
+    # Install required packages (httpd is Apache on RHEL/CentOS)
+    - name: Install Apache, PHP, and other utilities
+      ansible.builtin.yum:
+        name:
+          - httpd
+          - php
+          - php-mysql
+          - git
+          - libselinux-python # Required for SELinux management (if needed)
+        state: latest
+
+    # Ensure the Apache service is running and configured to start on boot
+    - name: Ensure httpd is running and enabled
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    # Configure Firewall to allow HTTP/HTTPS traffic (RHEL/CentOS uses firewall-cmd)
+    - name: Allow HTTP and HTTPS traffic in FirewallD
+      ansible.builtin.firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        state: enabled
+      loop:
+        - http
+        - https
+      notify:
+        - reload firewalld
+
+  handlers:
+    - name: reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
