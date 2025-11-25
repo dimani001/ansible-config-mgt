@@ -4,6 +4,16 @@
   become: yes
   become_user: ansible_deployer # Execute tasks as the dedicated deployment user
   tasks:
+    # --- NEW TASK: ENSURE DEPLOYER OWNS WEB ROOT ---
+    - name: Ensure /var/www/html is owned by ansible_deployer
+      become: yes # Temporarily escalate privileges back to root to change ownership
+      ansible.builtin.file:
+        path: /var/www/html
+        owner: ansible_deployer
+        group: apache
+        state: directory
+        mode: '0775'
+
     # Use the git module to clone the repository
     - name: Clone the tooling website repository
       ansible.builtin.git:
