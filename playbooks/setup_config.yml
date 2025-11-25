@@ -1,12 +1,28 @@
 ---
 - name: Configure Application Files and Ensure Web Services Are Running
   hosts: webservers
+  remote_user: ec2-user
   become: yes
-  become_user: ansible_deployer
+  become_user: ansible_deployer # Default user for tasks not specified otherwise
 
   tasks:
-    # Task 1: Deploy a simple PHP info file for testing (run as ansible_deployer)
+    # 1. ADMIN TASK: Temporarily allow deployment user to write to web root
+    # This must run as root to change group/mode on the directory.
+    - name: Temporarily grant write access to web root for deployment
+      become: yes
+      become_user: root # Override the default user to run as true root
+      ansible.builtin.file:
+        path: /var/www/html
+        state: directory
+        group: ansible_deployer
+        mode: '0775'
+
+    # 2. APPLICATION TASK: Deploy the file
+    # CRITICAL FIX: Running this task as 'root' allows it to successfully run 'chown'
+    # and set the owner/group to apache:apache.
     - name: Deploy application info file
+      become: yes # Run the task with sudo
+      become_user: root # Execute the task as the root user
       ansible.builtin.copy:
         content: |
           <?php
@@ -19,10 +35,22 @@
         group: apache
         mode: '0644'
 
-    # Task 2: Ensure httpd (Apache) service is running and enabled (requires root)
+    # 3. ADMIN TASK: Reset permissions back to original web server security
+    - name: Reset web root group ownership back to apache and secure mode
+      become: yes
+      become_user: root # Run as root to change ownership
+      ansible.builtin.file:
+        path: /var/www/html
+        state: directory
+        group: apache
+        mode: '0755'
+
+    # 4. SERVICE TASK: Ensure httpd service is started and enabled
     - name: Ensure httpd service is started and enabled
       become: yes
+      become_user: root # Run as root to manage services
       ansible.builtin.service:
         name: httpd
         state: started
         enabled: yes
+
