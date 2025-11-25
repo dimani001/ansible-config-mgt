@@ -1,0 +1,23 @@
+---
+- name: update web, nfs (RHEL/CentOS)
+  hosts: webservers, nfs
+  become: yes
+  tasks:
+    - name: ensure wireshark is at the latest version using yum
+      ansible.builtin.yum:
+        name: wireshark
+        state: latest
+
+
+- name: update LB, db server (Ubuntu)
+  hosts: lb, db
+  become: yes
+  tasks:
+    - name: Update apt repo cache
+      ansible.builtin.apt: 
+        update_cache: yes
+
+    - name: ensure wireshark is at the latest version using apt
+      ansible.builtin.apt:
+        name: wireshark
+        state: latest
