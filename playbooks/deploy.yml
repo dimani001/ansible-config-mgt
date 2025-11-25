@@ -1,47 +1,42 @@
 ---
 - name: Deploy the Tooling Website application
   hosts: webservers
-  become: yes
+  become: yes # Connects as ec2-user, then uses sudo
+  become_user: ansible_deployer # Default user for non-root tasks (like Git)
+
   tasks:
-# --- NEW TASK: DISABLE SELINUX ENFORCING MODE ---
-    - name: Temporarily set SELinux to permissive mode for deployment
-      become: yes
-      ansible.posix.selinux:
-        policy: targeted
-        state: permissive
 
-    # --- NEW TASK: ENSURE DEPLOYER OWNS WEB ROOT ---
-    - name: Ensure /var/www/html is owned by ansible_deployer
-      become: yes # Temporarily escalate privileges back to root to change ownership
-      ansible.builtin.file:
-        path: /var/www/html
-        owner: ansible_deployer
-        group: apache
-        state: directory
-        mode: '0775'
-
-    # Use the git module to clone the repository
-    - name: Clone the tooling website repository
+    # 1. Clone the app into a neutral directory (owned by ansible_deployer)
+    # We clone here because we are guaranteed write permissions as ansible_deployer.
+    - name: Clone the tooling website repository to temporary location
       ansible.builtin.git:
-        repo: https://github.com/dimani001/tooling.git # <<< IMPORTANT: CHANGE THIS TO YOUR TOOLING WEBSITE REPOSITORY
-        dest: /var/www/html
+        repo: https://github.com/dimani001/tooling.git # <<< ENSURE THIS URL IS CORRECT
+        dest: /home/ansible_deployer/tooling_clone
         update: yes
         force: yes
-        version: main # Use the main branch
+        version: master
       register: git_clone_status
 
-    # If the web app was cloned or updated, ensure file permissions are correct
-    - name: Set correct ownership and permissions for web root
-      ansible.builtin.file:
-        path: /var/www/html
-        owner: apache
-        group: apache
-        mode: '0775'
-        recurse: yes
+    # 2. Use shell commands (as root) to clean web root, copy files, fix permissions, and fix SELinux context.
+    # This block executes commands that require root and is designed to bypass SELinux module restrictions.
+    - name: Finalize deployment using shell commands (bypassing persistent SELinux issues)
+      become: yes # Run as root
+      ansible.builtin.shell: |
+        # 1. Clean up existing web root content
+        rm -rf /var/www/html/*
+        # 2. Copy the cloned content into the web root, preserving permissions/metadata
+        cp -a /home/ansible_deployer/tooling_clone/. /var/www/html/
+        # 3. Ensure the web server (apache) owns the content
+        chown -R apache:apache /var/www/html
+        # 4. Use restorecon to fix the SELinux file context (critical on hardened systems)
+        restorecon -Rv /var/www/html
+      args:
+        warn: false
       when: git_clone_status.changed
 
-    # Restart httpd service only if files were changed/updated
+    # 3. Restart httpd service if files were changed/updated (Requires root/sudo)
     - name: Restart httpd service if files changed
+      become: yes
       ansible.builtin.service:
         name: httpd
         state: restarted
