@@ -9,9 +9,11 @@
         name:
           - httpd
           - php
-          - php-mysql
+          - php-mysqlnd
           - git
+          - python3-firewall # <--- ADD THIS LINE
         state: latest
+        update_cache: yes
 
     # Ensure the Apache service is running and configured to start on boot
     - name: Ensure httpd is running and enabled
