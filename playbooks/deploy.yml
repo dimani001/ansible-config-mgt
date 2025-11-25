@@ -1,43 +1,42 @@
 ---
 - name: Deploy the Tooling Website application
   hosts: webservers
-  become: yes # Connects as ec2-user, then uses sudo
-  become_user: ansible_deployer # Default user for non-root tasks (like Git)
+  become: yes
+  become_user: ansible_deployer
 
   tasks:
 
-    # 1. Clone the app into a neutral directory (owned by ansible_deployer)
-    # We clone here because we are guaranteed write permissions as ansible_deployer.
+    # 1. Clone the application repository
     - name: Clone the tooling website repository to temporary location
       ansible.builtin.git:
-        repo: https://github.com/dimani001/tooling.git # <<< ENSURE THIS URL IS CORRECT
+        repo: https://github.com/dimani001/tooling.git
         dest: /home/ansible_deployer/tooling_clone
         update: yes
         force: yes
         version: master
       register: git_clone_status
 
-    # 2. Use shell commands (as root) to clean web root, copy files, fix permissions, and fix SELinux context.
-    # This block executes commands that require root and is designed to bypass SELinux module restrictions.
+    # 2. Copy files and fix SELinux contexts, ownership, etc.
     - name: Finalize deployment using shell commands (bypassing persistent SELinux issues)
-      become: yes # Run as root
+      become: yes    # run as root
       ansible.builtin.shell: |
-        # 1. Clean up existing web root content
+        # Clean existing web root content
         rm -rf /var/www/html/*
-        # 2. Copy the cloned content into the web root, preserving permissions/metadata
-        cp -a /home/ansible_deployer/tooling_clone/. /var/www/html/
-        # 3. Ensure the web server (apache) owns the content
-        chown -R apache:apache /var/www/html
-        # 4. Use restorecon to fix the SELinux file context (critical on hardened systems)
-        restorecon -Rv /var/www/html
-      args:
-        warn: false
-      when: git_clone_status.changed
 
-    # 3. Restart httpd service if files were changed/updated (Requires root/sudo)
+        # Copy new version from cloned repo
+        cp -a /home/ansible_deployer/tooling_clone/. /var/www/html/
+
+        # Set ownership to Apache
+        chown -R apache:apache /var/www/html
+
+        # Restore SELinux context
+        restorecon -Rv /var/www/html
+
+    # 3. Restart Apache only if repository changed
     - name: Restart httpd service if files changed
       become: yes
       ansible.builtin.service:
         name: httpd
         state: restarted
       when: git_clone_status.changed
+
