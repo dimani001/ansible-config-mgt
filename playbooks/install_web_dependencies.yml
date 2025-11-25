@@ -12,6 +12,7 @@
           - php-mysqlnd
           - git
           - python3-firewall # <--- ADD THIS LINE
+          - firewalld
         state: latest
         update_cache: yes
 
@@ -19,6 +20,13 @@
     - name: Ensure httpd is running and enabled
       ansible.builtin.service:
         name: httpd
+        state: started
+        enabled: yes
+    
+# --- NEW TASK TO FIX FIREWALL ISSUE ---
+    - name: Ensure firewalld service is running and enabled
+      ansible.builtin.service:
+        name: firewalld
         state: started
         enabled: yes
 
