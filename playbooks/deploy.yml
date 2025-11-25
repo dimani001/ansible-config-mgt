@@ -1,0 +1,32 @@
+---
+- name: Deploy the Tooling Website application
+  hosts: webservers
+  become: yes
+  become_user: ansible_deployer # Execute tasks as the dedicated deployment user
+  tasks:
+    # Use the git module to clone the repository
+    - name: Clone the tooling website repository
+      ansible.builtin.git:
+        repo: https://github.com/dimani001/tooling-website.git # <<< IMPORTANT: CHANGE THIS TO YOUR TOOLING WEBSITE REPOSITORY
+        dest: /var/www/html
+        update: yes
+        force: yes
+        version: main # Use the main branch
+      register: git_clone_status
+
+    # If the web app was cloned or updated, ensure file permissions are correct
+    - name: Set correct ownership and permissions for web root
+      ansible.builtin.file:
+        path: /var/www/html
+        owner: apache
+        group: apache
+        mode: '0775'
+        recurse: yes
+      when: git_clone_status.changed
+
+    # Restart httpd service only if files were changed/updated
+    - name: Restart httpd service if files changed
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: git_clone_status.changed
