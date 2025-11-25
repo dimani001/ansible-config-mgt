@@ -1,0 +1,28 @@
+---
+- name: Configure Application Files and Ensure Web Services Are Running
+  hosts: webservers
+  become: yes
+  become_user: ansible_deployer
+
+  tasks:
+    # Task 1: Deploy a simple PHP info file for testing (run as ansible_deployer)
+    - name: Deploy application info file
+      ansible.builtin.copy:
+        content: |
+          <?php
+          echo "<html><head><title>Tooling App Config</title></head><body>";
+          echo "<h1>Configuration Check Successful!</h1>";
+          echo "<p>This file verifies that Ansible can deploy configuration files correctly into the web root.</p>";
+          echo "</body></html>";
+        dest: /var/www/html/info.php
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    # Task 2: Ensure httpd (Apache) service is running and enabled (requires root)
+    - name: Ensure httpd service is started and enabled
+      become: yes
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: yes
