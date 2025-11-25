@@ -2,7 +2,6 @@
 - name: Deploy the Tooling Website application
   hosts: webservers
   become: yes
-  become_user: ansible_deployer # Execute tasks as the dedicated deployment user
   tasks:
 # --- NEW TASK: DISABLE SELINUX ENFORCING MODE ---
     - name: Temporarily set SELinux to permissive mode for deployment
