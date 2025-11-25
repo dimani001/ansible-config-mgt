@@ -7,7 +7,7 @@
     # Use the git module to clone the repository
     - name: Clone the tooling website repository
       ansible.builtin.git:
-        repo: https://github.com/dimani001/tooling-website.git # <<< IMPORTANT: CHANGE THIS TO YOUR TOOLING WEBSITE REPOSITORY
+        repo: https://github.com/dimani001/tooling.git # <<< IMPORTANT: CHANGE THIS TO YOUR TOOLING WEBSITE REPOSITORY
         dest: /var/www/html
         update: yes
         force: yes
