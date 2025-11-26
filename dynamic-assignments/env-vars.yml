@@ -1,0 +1,6 @@
+---
+vars_files:
+  - "{{ playbook_dir }}/../../env-vars/dev.yml"
+  - "{{ playbook_dir }}/../../env-vars/staging.yml"
+  - "{{ playbook_dir }}/../../env-vars/prod.yml"
+  - "{{ playbook_dir }}/../../env-vars/uat.yml"
