@@ -9,4 +9,4 @@
 10.0.1.48 ansible_ssh_user=ubuntu
 
 [lb]
-16.170.230.117 ansible_ssh_user=ubuntu
+10.0.1.127 ansible_ssh_user=ubuntu
