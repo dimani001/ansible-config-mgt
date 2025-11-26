@@ -1,72 +1,23 @@
 ---
-# Play 1: Targets RHEL/CentOS-like Servers (using yum)
-- name: update RHEL-based servers
-  hosts: webservers, nfs, db # Confirm these hosts are RHEL/CentOS
-  remote_user: ec2-user     # Use the user for RHEL/CentOS
+- name: update web, nfs (RHEL/CentOS)
+  hosts: webservers, nfs
   become: yes
-  become_user: root
   tasks:
-    - name: ensure wireshark is at the latest version
+    - name: ensure wireshark is at the latest version using yum
       ansible.builtin.yum:
         name: wireshark
         state: latest
 
-    - name: create a directory
-      ansible.builtin.file:
-        path: /opt/my-project-dir # <--- REPLACE with your actual path!
-        state: directory
-        mode: '0755'
 
-    - name: add a file into the directory
-      ansible.builtin.copy:
-        content: "This is a sample file content"
-        dest: /opt/my-project-dir/samplefile.txt # <--- REPLACE with your actual path!
-        mode: '0644'
-
-    - name: set timezone to UTC
-      ansible.builtin.timezone:
-        name: UTC
-
-    - name: run a shell script
-      ansible.builtin.shell: |
-        #!/bin/bash
-        echo "This is a shell script"
-        echo "Executed on $(date)" >> /opt/my-project-dir/script_output.txt # <--- REPLACE with your actual path!
-
-# Play 2: Targets Ubuntu/Debian-like Servers (using apt)
-- name: update Ubuntu-based servers
-  hosts: lb               # Confirm this is your Ubuntu host group
-  remote_user: ubuntu     # Use the user for Ubuntu
+- name: update LB, db server (Ubuntu)
+  hosts: lb, db
   become: yes
-  become_user: root
   tasks:
     - name: Update apt repo cache
-      ansible.builtin.apt:
+      ansible.builtin.apt: 
         update_cache: yes
 
-    - name: ensure wireshark is at the latest version
+    - name: ensure wireshark is at the latest version using apt
       ansible.builtin.apt:
         name: wireshark
         state: latest
-
-    - name: create a directory
-      ansible.builtin.file:
-        path: /opt/my-project-dir 
-        state: directory
-        mode: '0755'
-
-    - name: add a file into the directory
-      ansible.builtin.copy:
-        content: "This is a sample file content"
-        dest: /opt/my-project-dir/samplefile.txt
-        mode: '0644'
-
-    - name: set timezone to UTC
-      ansible.builtin.timezone:
-        name: UTC
-
-    - name: run a shell script
-      ansible.builtin.shell: |
-        #!/bin/bash
-        echo "This is a shell script"
-        echo "Executed on $(date)" >> /opt/my-project-dir/script_output.txt
