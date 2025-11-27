@@ -1,4 +1,11 @@
 ---
+# Make all handler tasks run with sudo
+- name: restart nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+  become: yes
+
 - name: restart nginx
   service: name=nginx state=restarted
 
