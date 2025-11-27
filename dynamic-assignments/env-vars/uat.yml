@@ -1,5 +1,5 @@
 ---
-load_balancer_is_required: true
-enable_nginx_lb: true   # set to false if you want Apache
-enable_apache_lb: false # set to true if you want Apache
+load_balancer_is_required: true        # set to true to enable LB tasks
+enable_nginx_lb: true                  # enable Nginx LB
+enable_apache_lb: false                # disable Apache LB
 

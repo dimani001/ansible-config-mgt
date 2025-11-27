@@ -1,4 +1,30 @@
 ---
+# Enable Nginx vhosts and upstream
+nginx_vhosts:
+  - listen: "80"  # default: "80"
+    server_name: "example.com"
+    server_name_redirect: "example.com"
+    root: "/var/www/html"
+    index: "index.php index.html index.htm"  # default: "index.html index.htm"
+
+    locations:
+      - path: "/"
+        proxy_pass: "http://myapp1"
+
+    # Optional properties
+    server_name_redirect: "www.example.com"
+    error_page: ""
+    access_log: ""
+    error_log: ""
+    extra_parameters: ""
+    template: "{{ nginx_vhost_template }}"
+    state: "present"
+
+nginx_upstream:
+  - name: myapp1
+    servers:
+      - "127.0.0.1:8080"
+
 # Used only for Debian/Ubuntu installation, as the -t option for apt.
 nginx_default_release: ""
 
@@ -81,15 +107,13 @@ nginx_vhosts: []
 #   template: "" # Can be used to override the `nginx_vhost_template` per host.
 #   state: "absent" # To remove the vhost configuration.
 
-nginx_upstreams: []
-# - name: myapp1
-#   strategy: "ip_hash" # "least_conn", etc.
-#   keepalive: 16 # optional
-#   servers:
-#     - "srv1.example.com"
-#     - "srv2.example.com weight=3"
-#     - "srv3.example.com"
-
+nginx_upstreams:
+  - name: myapp1
+    strategy: "ip_hash"  # alternatives: "least_conn", etc.
+    keepalive: 16  # optional
+    servers:
+      - "10.0.1.58 weight=5"
+      - "10.0.1.227 weight=5"
 nginx_log_format: |-
   '$remote_addr - $remote_user [$time_local] "$request" '
   '$status $body_bytes_sent "$http_referer" '
